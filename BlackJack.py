@@ -2,24 +2,25 @@ import random
 
 # global variables
 deck_of_cards = range(1, 53)
+Aces = [1, 14, 27, 40]
+# figure out how to reset the deck for when pop from empty list
+# reset_deck = []
 
-#TO DO: going to keep track in case of Aces, will append to list and clear at the end of round.
-#playerpulled = []
-#dealerpulled = []
-
+ace_value = 0
 playersum = 0
 dealersum = 0
 dhiddencard = ""
 
-# randomizes the list - KEEP
+# randomizes the list
 def shuffle_deck():
 	random.shuffle(deck_of_cards)
 
 # pulls a new card from the deck
 def draw():
-	return deck_of_cards.pop()
+	card = deck_of_cards.pop()
+	return card
 
-# determines the card name & suit - KEEP
+# determines the card name & suit
 def name_suit(x):
 	if x % 13 == 1:
 		name = "an Ace"
@@ -50,25 +51,17 @@ def name_suit(x):
 
 	return name + " of " + suit 
 
-# determines the value of the card - KEEP
+# determines the value of the card
 def value(x):
 	global dealersum
 	global playersum
 
+	# fix Ace interpretation for player
 	if x % 13 == 1:
 		if dealersum > 10:
 			value = 1
 		elif dealersum < 11:
 			value = 11
-		if playersum == True:
-			def pchoice():
-				pchoice = raw_input("choose value: 1 or 11")
-				if pchoice == 1:
-					value = 1
-				elif pchoice == 11:
-					value = 11
-				else:
-					pchoice()
 	elif x % 13 == 11:
 		value = 10
 	elif x % 13 == 12:
@@ -81,24 +74,55 @@ def value(x):
 		return False
 	return value
 
+def ace():
+	global ace_value
+
+	acevalue = raw_input("What is the value of your Ace? (1 or 11) ")
+	try:
+		if int(acevalue) == 1:
+			ace_value = 1
+		elif int(acevalue) == 11:
+			ace_value = 11
+		else:
+			print "Please enter a value of 1 or 11"
+			ace()
+	except ValueError:
+		print "Please enter a value of 1 or 11"
+		ace()
+
 def initial_deal():
 	global dealersum
 	global playersum
 	global dhiddencard
+	global ace_value
 
 	pcard1 = draw()
 	pcard2 = draw()
 	dcard1 = draw()
 	dcard2 = draw()
 
-	playersum = value(pcard1) + value(pcard2)
+	playersum = value(pcard1) + value(pcard2) 
 	dealersum = value(dcard1) + value(dcard2)
 	dealervisiblesum = value(dcard1)
 	dhiddencard = name_suit(dcard2)
 
 	# player hand
+	if pcard1 in Aces:
+		print "You have been dealt " + name_suit(pcard1) + " and " + name_suit(pcard2)
+		ace()
+		playersum = ace_value + value(pcard2)
+	elif pcard2 in Aces:
+		print "You have been dealt " + name_suit(pcard1) + " and " + name_suit(pcard2)
+		ace()
+		playersum = ace_value + value(pcard1)
+	elif pcard1 in Aces and pcard2 in Aces:
+		print "You have been dealt " + name_suit(pcard1) + " and " + name_suit(pcard2)
+		playersum = 12 
+	else:
+		playersum = value(pcard1) + value(pcard2)
+	
 	print "You have been dealt " + name_suit(pcard1) + " and " + name_suit(pcard2) + " for a sum of " + str(playersum) + "."
-
+	
 	# dealer hand
 	print "The dealer has drawn " + name_suit(dcard1)
 
@@ -106,17 +130,23 @@ def initial_deal():
 		print "and " + name_suit(dcard2)
 		print "Dealer has a final sum of " + str(dealersum)
 		print "You have a final sum of " + str(playersum)
-		print "Push"
+		print "Push :|"
+		print ""
+		play_again()
 	elif dealersum == 21 and playersum != 21:
 		print "and " + name_suit(dcard2)
 		print "Dealer has a final sum of " + str(dealersum)
 		print "You have a final sum of " + str(playersum)
-		print "Dealer has blackjack"
+		print "Dealer has BlackJack :("
+		print ""
+		play_again()
 	elif dealersum != 21 and playersum == 21:
 		print "and " + name_suit(dcard2)
 		print "Dealer has a final sum of " + str(dealersum)
 		print "You have a final sum of " + str(playersum)
-		print "You have blackjack!"
+		print "Blackjack! You win :)"
+		print ""
+		play_again()
 	elif dealersum != 21 and playersum != 21:
 		print "The dealer's second card is hidden"
 		print "Dealer has a visible sum of " + str(dealervisiblesum)
@@ -149,9 +179,12 @@ def nextdeal():
 				print "That is not a valid answer."
 				nextdeal()
 	elif playersum > 21:
+		print "Bust!"
 		print "The dealer's hidden card was a " + dhiddencard
 		print "Dealer has a final sum of " + str(dealersum)
-		print "Dealer wins"
+		print "Dealer wins :("
+		print ""
+		play_again()
 	else:
 		stay()
 
@@ -170,22 +203,30 @@ def stay():
 			print "The dealer's hidden card was a " + dhiddencard
 			print "Dealer has a final sum of " + str(dealersum)
 			print "You have a final sum of " + str(playersum)
-			print "Push"
+			print "Push :|"
+			print ""
+			play_again()
 		elif dealersum > playersum and dealersum < 22:
 			print "The dealer's hidden card was a " + dhiddencard
 			print "Dealer has a final sum of " + str(dealersum)
 			print "You have a final sum of " + str(playersum)
-			print "Dealer wins"
+			print "Dealer wins :("
+			print ""
+			play_again()
 		elif dealersum > 21:
 			print "The dealer's hidden card was a " + dhiddencard
 			print "Dealer has a final sum of " + str(dealersum)
 			print "You have a final sum of " + str(playersum)
-			print "You won!"
+			print "You won! :)"
+			print ""
+			play_again()
 		elif dealersum < playersum:
 			print "The dealer's hidden card was a " + dhiddencard
 			print "Dealer has a final sum of " + str(dealersum)
 			print "You have a final sum of " + str(playersum)
-			print "You won!"
+			print "You won! :)"
+			print ""
+			play_again()
 	else:
 		return False
 
@@ -205,27 +246,53 @@ def dealerhand():
 		if dealersum == 21:
 			if playersum == 21:
 				print "You have a final sum of " + str(playersum)
-				print "Push"
+				print "Push :|"
+				print ""
+				play_again()
 			else:
 				print "You have a final sum of " + str(playersum)
-				print "Dealer wins"
+				print "Dealer wins :("
+				print ""
+				play_again()
 		elif dealersum == playersum:
 			print "You have a final sum of " + str(playersum)
-			print "Push"
+			print "Push :|"
+			print ""
+			play_again()
 		elif dealersum > playersum:
 			print "You have a final sum of " + str(playersum)
-			print "Dealer wins"
+			print "Dealer wins :("
+			print ""
+			play_again()
 		elif dealersum < playersum:
 			print "You have a final sum of " + str(playersum)
-			print "You won!"
+			print "You won! :)"
+			print ""
+			play_again()
 	elif playersum > 21:
 		print "You have a final sum of " + str(playersum)
-		print "Dealer wins"
+		print "Dealer wins :("
+		print ""
+		play_again()
 	elif dealersum > 21 and playersum < 22:
 		print "You have a final sum of " + str(playersum)
-		print "You won!"
+		print "You won! :)"
+		print ""
+		play_again()
 	else:
 		return False
 
+def play_again():
+	answer = raw_input("Do you want to play again? (yes/no) ").lower()
+	print ""
+	if answer == "yes":
+		initial_deal()
+	elif answer == "no":
+		print "Okay, come back soon!"
+	else:
+		print "That is not a valid answer."
+		play_again()
+
 shuffle_deck()
 initial_deal()
+
