@@ -1,24 +1,35 @@
+# implement a betting system 
+
 import random
 
 # global variables
 deck_of_cards = range(1, 53)
 Aces = [1, 14, 27, 40]
-# figure out how to reset the deck for when pop from empty list
-# reset_deck = []
 
-ace_value = 0
 playersum = 0
 dealersum = 0
 dhiddencard = ""
+ace_value = 0
 
 # randomizes the list
 def shuffle_deck():
 	random.shuffle(deck_of_cards)
 
-# pulls a new card from the deck
+# pulls a new card from the deck & shuffles when deck reaches 0 cards
 def draw():
-	card = deck_of_cards.pop()
-	return card
+	global deck_of_cards
+
+	if len(deck_of_cards) == 1:
+		print ""
+		print " ** T h e   d e c k   h a s   b e e n   s h u f f l e d ** "
+		print ""
+		deck_of_cards = range(1,53)
+		shuffle_deck()
+		draw = deck_of_cards.pop()
+		return draw
+	elif len(deck_of_cards) > 0:
+		draw = deck_of_cards.pop()
+		return draw
 
 # determines the card name & suit
 def name_suit(x):
@@ -52,11 +63,13 @@ def name_suit(x):
 	return name + " of " + suit 
 
 # determines the value of the card
+# check to ensure that dealers ace is making the most of their hand
 def value(x):
 	global dealersum
 	global playersum
+	global pcard1
+	global pcard2
 
-	# fix Ace interpretation for player
 	if x % 13 == 1:
 		if dealersum > 10:
 			value = 1
@@ -74,9 +87,9 @@ def value(x):
 		return False
 	return value
 
+# determines value of player ace
 def ace():
 	global ace_value
-
 	acevalue = raw_input("What is the value of your Ace? (1 or 11) ")
 	try:
 		if int(acevalue) == 1:
@@ -90,6 +103,7 @@ def ace():
 		print "Please enter a value of 1 or 11"
 		ace()
 
+# starts the game
 def initial_deal():
 	global dealersum
 	global playersum
@@ -101,7 +115,6 @@ def initial_deal():
 	dcard1 = draw()
 	dcard2 = draw()
 
-	playersum = value(pcard1) + value(pcard2) 
 	dealersum = value(dcard1) + value(dcard2)
 	dealervisiblesum = value(dcard1)
 	dhiddencard = name_suit(dcard2)
@@ -159,6 +172,7 @@ def nextdeal():
 	global dealersum
 	global playersum
 	global dhiddencard
+	global ace_value
 	
 	if playersum < 21:
 		hit_or_stay = raw_input("Do you want to hit or stay? (hit/stay) ").lower()
@@ -170,9 +184,16 @@ def nextdeal():
 				stay()
 			elif hit_or_stay == "hit":
 				drawncard = draw()
-				cardvalue = value(drawncard) 
-				playersum += cardvalue
-				print "You have drawn " + name_suit(drawncard)
+				
+				if drawncard in Aces:
+					ace()
+					print "You have been dealt " + name_suit(drawncard)
+					playersum += ace_value
+				else:
+					cardvalue = value(drawncard) 
+					playersum += cardvalue
+					print "You have drawn " + name_suit(drawncard)
+				
 				print "Which brings the card sum to " + str(playersum)
 				nextdeal()
 			else:
@@ -189,7 +210,7 @@ def nextdeal():
 		stay()
 
 
-# if player chooses to stay - KEEP
+# if player chooses to stay
 def stay():
 	global playersum
 	global dealersum
@@ -230,7 +251,7 @@ def stay():
 	else:
 		return False
 
-# dealer hand - KEEP
+# dealer hand
 def dealerhand():
 	global playersum
 	global dealersum
@@ -282,6 +303,7 @@ def dealerhand():
 	else:
 		return False
 
+# game continuation
 def play_again():
 	answer = raw_input("Do you want to play again? (yes/no) ").lower()
 	print ""
