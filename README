@@ -1,0 +1,20 @@
+Contact me:
+Krystal
+e.krystal@gmail.com
+
+Program created: 
+December 2012
+
+Information:
+This is a basic BlackJack program, written in Python.  In BlackJack, the goal is to have your cards add up to, but not exceed, 21.  Each card has a value: 10, Jack, Queen, and King all equal 10; Ace is either valued at 1 or 11, depending on what would be the best value for your (or the dealer's) hand; every other card is the same value as the number is equals (3 has a point value of 3).  For a full description of how to play, visit http://www.blackjackinfo.com.
+
+Goals:
+I still have a long way to go on this project.  A few of my goals are as follows:
+- Implement a betting system
+- Make it so that the value of a previously drawn Ace can be changed mid-hand
+- Make it so that a deal can be split when two cards of value 10 are drawn initially
+
+If you have any suggestions, or recommendations, for features/code, please feel free to send an email.
+
+Thanks!
+-Kryst
